@@ -1,0 +1,24 @@
+{
+  "development": {
+    "username": "verdhatpxrkilw",
+    "password": "cbfea8cb0e88f6d06bc955d6875191bb4b84c9883815a06f8a3f6232fb1c50d2",
+    "database": "d9gj9a9bv0u1og",
+    "host": "localhost",
+    "dialect": "postgres",
+    "operatorsAliases": false
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
