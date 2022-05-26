@@ -1,40 +1,9 @@
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000
-// nn.outputlayer =  [ { name: 'NN', outputlayer: [0,0,0,0,0]} ]
-/* 
-    Incase you are using mongodb atlas database uncomment below line
-    and replace "mongoAtlasUri" with your mongodb atlas uri.
-*/
-// mongoose.connect( mongoAtlasUri, {useNewUrlParser: true, useUnifiedTopology: true})
-// Read data.json file
-
-function isArrayOfNumbers(arr) {
-  for (var i = 0; i < arr.length; i++) {
-    if (typeof arr[i] !== 'number') {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-function getNumberArrays(obj) {
-  var numArrays = [];
-  if (Array.isArray(obj)) {
-    if (isArrayOfNumbers(obj)) {
-      numArrays.push(obj);
-    }
-  } else if ((typeof obj === "object") && (obj !== null)) {
-    for (var key in obj) {
-      if (Array.isArray(obj[key]) && isArrayOfNumbers(obj[key])) {
-        numArrays.push(obj[key]);
-      }
-    }
-  }
-
-  return numArrays;
-}
+var total="0,0,0,0,0"
+const fs = require('fs');
+let  jsonData=""
 
 function sumlist(a,b){
 
@@ -45,49 +14,44 @@ function sumlist(a,b){
   return intArr;
 }
 
+
+fs.readFile("data.json", function(err, data) {  
+  if (err) throw err;
+    jsonData = JSON.parse(data);
+});
+
+
 app.get('/', (req, res) => {
   res.send('NN Server..')
 })
 
-app.get('/update', function(req, res) {
-  var output = JSON.parse(req.query.output);
+app.get('/reset', (req, res) => {
+  res.send('Reset NN Server..')
 
-  const fs = require('fs');
-  fs.readFile("data.json", function(err, data) {  
-  if (err) throw err;
-  var  jsonData = JSON.parse(data);
-  var outputlayer =  jsonData.outputlayer;
-
-
-    var array1 =outputlayer.split(",").map(Number)
-    var array2 =output.split(",").map(Number)
-
-    console.log("arr1 "+array1)
-    console.log("arr2 "+array2)
-    var summation = sumlist(array1,array2); 
-    console.log(summation)
-    res.send({
-      'updated': summation
-    });
-  });
+  fs.writeFile("data.json", {"updated":"0,0,0,0,0"}, err => { 
+    if (err) throw err; 
 });
+  res.send({"updated":"0,0,0,0,0"});
 
+})
 
-   
+app.get('/update', function(req, res) {
+    var output = JSON.parse(req.query.output);
+    var outputlayer =  jsonData.updated;
+  
+    var array1  =  Array.from(outputlayer.split(','),Number);
+    var array2 =   Array.from(output.split(','),Number);
 
-// let nn = {
-//     outputlayer: ["PHP", "Go", "JavaScript"]
-// };
-   
-   
-// // STEP 3: Writing to a file
-// fs.writeFile("data.json", JSON.stringify(nn), err => {
-     
-//     // Checking for errors
-//     if (err) throw err; 
-   
-//     console.log("Done writing"); // Success
-// });
+    total = sumlist(array1,array2); 
+
+    let stringWithoutBrackets = JSON.stringify(total).replace(/[{()}[\]]/g, '');
+    jsonData.updated=stringWithoutBrackets
+  
+    fs.writeFile("data.json", jsonData, err => { 
+      if (err) throw err; 
+  });
+    res.send(jsonData);
+});
 
 
 app.listen(port, () => {
